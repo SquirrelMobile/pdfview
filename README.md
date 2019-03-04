@@ -3,6 +3,9 @@
 
 Module for display pdf in a view in titanium, with zoom + scroll.
 
+
+<img src="https://github.com/SquirrelMobile/pdfview/blob/master/screen/ScreenshotExample.jpg?raw=true" width="200" >
+
 ## Module Naming
 
 	fr.squirrel.pdfview
