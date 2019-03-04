@@ -1,7 +1,7 @@
 
-# Appcelerator Titanium Mobile Module Project
+# pdfView for Android
 
-This is a skeleton Titanium Mobile Mobile module project.
+Module for display pdf in a view in titanium, with zoom + scroll.
 
 ## Module Naming
 
@@ -42,4 +42,3 @@ Or by "file" property
 - url (string) : this property is for load a pdf directly by url.
 - file (Ti.Filesystem.File) : this property is for load a pdf directly by a file.
 - spacing : this property is for edit the spacing between pages in dp.
- 
