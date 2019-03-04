@@ -8,6 +8,7 @@ This is a skeleton Titanium Mobile Mobile module project.
 	fr.squirrel.pdfview
 
 ## Example usage
+Load a pdf with "url" property
 
 	  var pdfView = require("fr.squirrel.pdfview").createView({
 	   height : Ti.UI.FILL,
@@ -16,9 +17,29 @@ This is a skeleton Titanium Mobile Mobile module project.
 	  });
 	  $.container.add(pdfView);
 
+Or by "file" property
+
+	 var downloadingFileUrl = "https://monurl/sample.pdf"
+	 var file = Titanium.Filesystem.getFile(Titanium.Filesystem.externalStorageDirectory,"./sample.pdf");
+	 var httpC = Ti.Network.createHTTPClient();
+
+	 httpC.onload = function(httpClient){
+
+	  var pdfView = require("fr.squirrel.pdfview").createView({
+	    height : Ti.UI.FILL,
+	    width : Ti.UI.FILL,
+	    file : file
+	  });
+	  $.container.add(pdfView);
+	 };
+	 httpC.open("GET", downloadingFileUrl);
+	 httpC.setFile(file.getNativePath());
+	 httpC.send(null);
+
 
 ## Properties
 
 - url (string) : this property is for load a pdf directly by url.
-- spacing : this property is for edit the spacing between pages in dp
+- file (Ti.Filesystem.File) : this property is for load a pdf directly by a file.
+- spacing : this property is for edit the spacing between pages in dp.
  
