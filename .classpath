@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="android/src"/>
+	<classpathentry kind="src" path="android/build/.apt_generated"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/Programmes/SDKAndroid/platforms/android-23/android.jar"/>
+	<classpathentry kind="lib" path="C:/ProgramData/Titanium/mobilesdk/win32/7.5.0.GA/android/titanium.jar"/>
+	<classpathentry kind="lib" path="C:/ProgramData/Titanium/mobilesdk/win32/7.5.0.GA/android/kroll-common.jar"/>
+	<classpathentry kind="lib" path="C:/ProgramData/Titanium/mobilesdk/win32/7.5.0.GA/android/kroll-apt.jar"/>
+	<classpathentry kind="src" path=".apt_generated">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/Documents/Titanium/pdfview/android/lib/android-pdf-viewer-2.8.2.aar"/>
+	<classpathentry kind="lib" path="D:/Documents/Titanium/pdfview/android/lib/pdfium-android-1.7.1.aar"/>
+	<classpathentry kind="lib" path="D:/Documents/Titanium/pdfview/android/lib/android-pdf-viewer-2.8.2.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Titanium/pdfview/android/lib/pdfium-android-1.7.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,13 @@
+int attr sb_handlerColor 0x7f010000
+int attr sb_horizontal 0x7f010003
+int attr sb_indicatorColor 0x7f010001
+int attr sb_indicatorTextColor 0x7f010002
+int drawable default_scroll_handle_bottom 0x7f020000
+int drawable default_scroll_handle_left 0x7f020001
+int drawable default_scroll_handle_right 0x7f020002
+int drawable default_scroll_handle_top 0x7f020003
+int[] styleable ScrollBar { 0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003 }
+int styleable ScrollBar_sb_handlerColor 0
+int styleable ScrollBar_sb_horizontal 3
+int styleable ScrollBar_sb_indicatorColor 1
+int styleable ScrollBar_sb_indicatorTextColor 2
