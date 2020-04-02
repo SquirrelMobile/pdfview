@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rotate xmlns:android="http://schemas.android.com/apk/res/android" android:drawable="@drawable/default_scroll_handle_right" android:fromDegrees="180" android:toDegrees="180" android:visible="true"/>
