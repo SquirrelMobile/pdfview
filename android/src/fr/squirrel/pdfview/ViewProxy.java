@@ -34,15 +34,10 @@ public class ViewProxy extends TiViewProxy
 	private static final boolean DBG = TiConfig.LOGD;
 	private static PdfViewer pdfViewer;
 
-
-		
-
-
 	// Constructor
 	public ViewProxy()
 	{
 		super();
-		
 	}
 	
 	@Override
@@ -56,17 +51,13 @@ public class ViewProxy extends TiViewProxy
 
 	@Kroll.method
 	private void setFile(Object f) {
-		
 		pdfViewer.setFile(f);
-		
 	}
 	
 
 	@Kroll.method
 	private void setUrl(String str) {
-		
 		pdfViewer.setUrl(str);
-		
 	}
 	
 	// Handle creation options
@@ -75,14 +66,4 @@ public class ViewProxy extends TiViewProxy
 	{
 		super.handleCreationDict(options);
 	}
-
-	// Methods
-	@Kroll.method
-	public void printMessage(String message)
-	{
-		Log.d(LCAT, "printing message: " + message);
-	}
-
-
-	
 }

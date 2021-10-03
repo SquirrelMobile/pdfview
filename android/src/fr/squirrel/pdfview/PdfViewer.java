@@ -43,7 +43,7 @@ public class PdfViewer extends TiUIView {
 	int MODE_URL = 0;
 	int MODE_FILE = 1;
 
-	
+
 	PDFView pdfView;
 	int space = 20;
 	int layout_drawer_main = 0;
@@ -51,7 +51,13 @@ public class PdfViewer extends TiUIView {
 	String currentUrl;
 	File currentFile;
 	String path;
-	
+	String password = null;
+	boolean pageSnap = false;
+	boolean nightMode = false;
+	boolean pageFling = false;
+	boolean swipeHorizontal = false;
+
+
 	public PdfViewer(TiViewProxy proxy) {
 		super(proxy);
 		try {
@@ -68,13 +74,13 @@ public class PdfViewer extends TiUIView {
 		pdfView = (PDFView)rl.findViewById(resId_ratingBar);
 		setNativeView(rl);
 	}
-	
-	
+
+
 		// TODO Auto-generated constructor stub
 	@Override
 	public void propertyChanged(String arg0, Object arg1, Object arg2, KrollProxy arg3) {
 		// TODO Auto-generated method stub
-		
+
 		if (arg0.equals("url")) {
 			setUrl(TiConvert.toString(arg0.equals("url")));
 		}
@@ -86,13 +92,30 @@ public class PdfViewer extends TiUIView {
 			setFile(arg0.equals("file"));
 		}
 	}
-	
-	
+
+
 	@Override
 	public void processProperties(KrollDict props) {
 		// TODO Auto-generated method stub
 		super.processProperties(props);
-		
+
+		if (props.containsKey("password")) {
+			password = TiConvert.toString(proxy.getProperty("password"), "");
+		}
+
+		if (props.containsKey("nightMode")) {
+			nightMode = TiConvert.toBoolean(proxy.getProperty("nightMode"), false);
+		}
+		if (props.containsKey("pageFling")) {
+			pageFling = TiConvert.toBoolean(proxy.getProperty("pageFling"), false);
+		}
+		if (props.containsKey("swipeHorizontal")) {
+			swipeHorizontal = TiConvert.toBoolean(proxy.getProperty("swipeHorizontal"), false);
+		}
+		if (props.containsKey("pageSnap")) {
+			pageSnap = TiConvert.toBoolean(proxy.getProperty("pageSnap"), false);
+		}
+
 		if (props.containsKey("url")) {
 			setUrl(TiConvert.toString(proxy.getProperty("url")));
 		}
@@ -100,11 +123,11 @@ public class PdfViewer extends TiUIView {
 			this.space = TiConvert.toInt(proxy.getProperty("spacing"));
 			reload();
 		}
-		
+
 		if (props.containsKey("file")) {
 			setFile(proxy.getProperty("file"));
 		}
-		
+
 	}
 
 
@@ -123,8 +146,8 @@ public class PdfViewer extends TiUIView {
 		this.currentFile = new File(absolutePath);
 		reload();
 	}
-	
-	
+
+
 	private void reload() {
 		if (mode == MODE_URL) {
 			if(this.currentUrl != null) {
@@ -133,14 +156,21 @@ public class PdfViewer extends TiUIView {
 		}
 		else if(mode == MODE_FILE) {
 			if(this.currentFile != null) {
-				pdfView.fromFile(this.currentFile).spacing(space).load();
+				pdfView.fromFile(this.currentFile)
+						.password(password)
+						.pageSnap(pageSnap)
+						.pageFling(pageFling)
+						.swipeHorizontal(swipeHorizontal)
+						.nightMode(nightMode)
+						.spacing(space)
+						.load();
 			}
 		}
 	}
-	
-	
+
+
 	class RetrivePDFStream extends AsyncTask<String, Void, InputStream> {
-		
+
 		protected InputStream doInBackground(String... strings) {
 			InputStream inputStream = null;
 			try {
@@ -155,9 +185,16 @@ public class PdfViewer extends TiUIView {
 			return inputStream;
 		}
 		protected void onPostExecute(InputStream inputStream) {
-			pdfView.fromStream(inputStream).spacing(space).load();
+			pdfView.fromStream(inputStream)
+					.password(password)
+					.pageSnap(pageSnap)
+					.pageFling(pageFling)
+					.swipeHorizontal(swipeHorizontal)
+					.nightMode(nightMode)
+					.spacing(space)
+					.load();
 		}
 	}
-	
-	
+
+
 }
