@@ -37,8 +37,10 @@ import org.appcelerator.titanium.view.TiUIView;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
+import com.github.barteksc.pdfviewer.listener.OnErrorListener;
+import com.shockwave.pdfium.PdfPasswordException;
 
-public class PdfViewer extends TiUIView {
+public class PdfViewer extends TiUIView implements OnErrorListener {
 
 	int MODE_URL = 0;
 	int MODE_FILE = 1;
@@ -130,7 +132,6 @@ public class PdfViewer extends TiUIView {
 
 	}
 
-
 	public void setUrl(String s) {
 		mode = MODE_URL;
 		this.currentUrl = s;
@@ -160,6 +161,7 @@ public class PdfViewer extends TiUIView {
 						.password(password)
 						.pageSnap(pageSnap)
 						.pageFling(pageFling)
+						.onError(this)
 						.swipeHorizontal(swipeHorizontal)
 						.nightMode(nightMode)
 						.spacing(space)
@@ -168,8 +170,19 @@ public class PdfViewer extends TiUIView {
 		}
 	}
 
+	@Override
+	public void onError(Throwable t) {
+		KrollDict kd = new KrollDict();
+		kd.put("message", t.getMessage());
+		if (t instanceof PdfPasswordException) {
+			kd.put("passwordError", true);
+		}
+		fireEvent("error", kd);
+		Log.e("pdfview", t.getMessage());
+	}
 
-	class RetrivePDFStream extends AsyncTask<String, Void, InputStream> {
+
+	class RetrivePDFStream extends AsyncTask<String, Void, InputStream> implements OnErrorListener {
 
 		protected InputStream doInBackground(String... strings) {
 			InputStream inputStream = null;
@@ -188,11 +201,23 @@ public class PdfViewer extends TiUIView {
 			pdfView.fromStream(inputStream)
 					.password(password)
 					.pageSnap(pageSnap)
+					.onError(this)
 					.pageFling(pageFling)
 					.swipeHorizontal(swipeHorizontal)
 					.nightMode(nightMode)
 					.spacing(space)
 					.load();
+		}
+
+		@Override
+		public void onError(Throwable t) {
+			KrollDict kd = new KrollDict();
+			kd.put("message", t.getMessage());
+			if (t instanceof PdfPasswordException) {
+				kd.put("passwordError", true);
+			}
+			fireEvent("error", kd);
+			Log.e("pdfview", t.getMessage());
 		}
 	}
 

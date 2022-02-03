@@ -76,3 +76,7 @@ win.open();
 - <b>pageFling (boolean)</b> : make a fling change only a single page like ViewPager
 - <b>pageSnap (boolean)</b> : snap pages to screen boundaries at the end of a scroll
 - <b>swipeHorizontal (boolean)</b> : horizontal swipe
+
+## Events
+
+- <b>error</b>: with `message`, `passwordError` (true if password is wrong)
