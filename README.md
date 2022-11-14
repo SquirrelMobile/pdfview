@@ -76,6 +76,9 @@ win.open();
 - <b>pageFling (boolean)</b> : make a fling change only a single page like ViewPager
 - <b>pageSnap (boolean)</b> : snap pages to screen boundaries at the end of a scroll
 - <b>swipeHorizontal (boolean)</b> : horizontal swipe
+- <b>minZoom (float)</b> : sets min zoom level (default 1)
+- <b>midZoom (float)</b> : sets mid zoom level (default 1.75)
+- <b>maxZoom (float)</b> : sets max zoom level (default 3)
 
 ## Events
 
