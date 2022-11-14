@@ -58,7 +58,9 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 	boolean nightMode = false;
 	boolean pageFling = false;
 	boolean swipeHorizontal = false;
-
+	float maxZoom = 3.0f;
+	float minZoom = 1.0f;
+	float midZoom = 1.75f;
 
 	public PdfViewer(TiViewProxy proxy) {
 		super(proxy);
@@ -74,6 +76,9 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 		int resId_ratingBar = resources.getIdentifier("pdfView","id", packageName);
 		RelativeLayout rl = (RelativeLayout) inflater.inflate(layout_drawer_main, null, false);
 		pdfView = (PDFView)rl.findViewById(resId_ratingBar);
+		pdfView.setMaxZoom(maxZoom);
+		pdfView.setMinZoom(minZoom);
+		pdfView.setMidZoom(midZoom);
 		setNativeView(rl);
 	}
 
@@ -95,16 +100,41 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 		}
 	}
 
+	public void setMaxZoom(Float value){
+		maxZoom = value;
+		pdfView.setMaxZoom(maxZoom);
+	}
+
+	public void setMinZoom(Float value){
+		minZoom = value;
+		pdfView.setMinZoom(minZoom);
+	}
+
+	public void setMidZoom(Float value){
+		midZoom = value;
+		pdfView.setMidZoom(midZoom);
+	}
+
 
 	@Override
 	public void processProperties(KrollDict props) {
 		// TODO Auto-generated method stub
 		super.processProperties(props);
-
 		if (props.containsKey("password")) {
 			password = TiConvert.toString(proxy.getProperty("password"), "");
 		}
-
+		if (props.containsKey("maxZoom")) {
+			maxZoom = TiConvert.toFloat(proxy.getProperty("maxZoom"));
+			pdfView.setMaxZoom(maxZoom);
+		}
+		if (props.containsKey("minZoom")) {
+			minZoom = TiConvert.toFloat(proxy.getProperty("minZoom"));
+			pdfView.setMinZoom(minZoom);
+		}
+		if (props.containsKey("midZoom")) {
+			midZoom = TiConvert.toFloat(proxy.getProperty("midZoom"));
+			pdfView.setMidZoom(midZoom);
+		}
 		if (props.containsKey("nightMode")) {
 			nightMode = TiConvert.toBoolean(proxy.getProperty("nightMode"), false);
 		}

@@ -4,66 +4,68 @@
  * Copyright (c) 2009-2017 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
- *
  */
 package fr.squirrel.pdfview;
 
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollProxy;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiC;
-import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
-import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiCompositeLayout;
-import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
-import org.appcelerator.titanium.view.TiUIView;
-import com.github.barteksc.pdfviewer.PDFView;
-
 import android.app.Activity;
-import android.util.AttributeSet;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.kroll.common.TiConfig;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.util.TiConvert;
+import org.appcelerator.titanium.view.TiUIView;
 
 
 // This proxy can be created by calling Pdfview.createExample({message: "hello world"})
-@Kroll.proxy(creatableInModule=PdfviewModule.class)
-public class ViewProxy extends TiViewProxy
-{
-	// Standard Debugging variables
-	private static final String LCAT = "ExampleProxy";
-	private static final boolean DBG = TiConfig.LOGD;
-	private static PdfViewer pdfViewer;
+@Kroll.proxy(creatableInModule = PdfviewModule.class)
+public class ViewProxy extends TiViewProxy {
+    // Standard Debugging variables
+    private static final String LCAT = "ExampleProxy";
+    private static final boolean DBG = TiConfig.LOGD;
+    private static PdfViewer pdfViewer;
 
-	// Constructor
-	public ViewProxy()
-	{
-		super();
-	}
-	
-	@Override
-	public TiUIView createView(Activity activity)
-	{
-		pdfViewer = new PdfViewer(this);
-		pdfViewer.getLayoutParams().autoFillsHeight = true;
-		pdfViewer.getLayoutParams().autoFillsWidth = true;
-		return pdfViewer;
-	}
+    // Constructor
+    public ViewProxy() {
+        super();
+    }
 
-	@Kroll.method
-	private void setFile(Object f) {
-		pdfViewer.setFile(f);
-	}
-	
+    @Override
+    public TiUIView createView(Activity activity) {
+        pdfViewer = new PdfViewer(this);
+        pdfViewer.getLayoutParams().autoFillsHeight = true;
+        pdfViewer.getLayoutParams().autoFillsWidth = true;
+        return pdfViewer;
+    }
 
-	@Kroll.method
-	private void setUrl(String str) {
-		pdfViewer.setUrl(str);
-	}
-	
-	// Handle creation options
-	@Override
-	public void handleCreationDict(KrollDict options)
-	{
-		super.handleCreationDict(options);
-	}
+    @Kroll.method
+    private void setFile(Object f) {
+        if (pdfViewer != null) pdfViewer.setFile(f);
+    }
+
+    @Kroll.setProperty
+    private void setMaxZoom(Object value) {
+        if (pdfViewer != null) pdfViewer.setMaxZoom(TiConvert.toFloat(value));
+    }
+
+    @Kroll.setProperty
+    private void setMinZoom(Object value) {
+        if (pdfViewer != null) pdfViewer.setMinZoom(TiConvert.toFloat(value));
+    }
+
+    @Kroll.setProperty
+    private void setMidZoom(Object value) {
+        if (pdfViewer != null) pdfViewer.setMidZoom(TiConvert.toFloat(value));
+    }
+
+    @Kroll.method
+    private void setUrl(String str) {
+        if (pdfViewer != null) pdfViewer.setUrl(str);
+    }
+
+    // Handle creation options
+    @Override
+    public void handleCreationDict(KrollDict options) {
+        super.handleCreationDict(options);
+    }
 }
