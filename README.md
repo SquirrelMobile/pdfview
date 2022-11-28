@@ -79,6 +79,7 @@ win.open();
 - <b>minZoom (float)</b> : sets min zoom level (default 1)
 - <b>midZoom (float)</b> : sets mid zoom level (default 1.75)
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)
+* <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false)
 
 ## Events
 

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +59,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 	boolean nightMode = false;
 	boolean pageFling = false;
 	boolean swipeHorizontal = false;
+	boolean nestedScrolling = false;
 	float maxZoom = 3.0f;
 	float minZoom = 1.0f;
 	float midZoom = 1.75f;
@@ -160,6 +162,9 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 			setFile(proxy.getProperty("file"));
 		}
 
+		if (props.containsKey("nestedScrolling")) {
+			nestedScrolling = TiConvert.toBoolean(proxy.getProperty("nestedScrolling"), false);
+		}
 	}
 
 	public void setUrl(String s) {
@@ -196,6 +201,11 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 						.nightMode(nightMode)
 						.spacing(space)
 						.load();
+				if (nestedScrolling) {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						pdfView.setNestedScrollingEnabled(nestedScrolling);
+					}
+				}
 			}
 		}
 	}
@@ -237,6 +247,11 @@ public class PdfViewer extends TiUIView implements OnErrorListener {
 					.nightMode(nightMode)
 					.spacing(space)
 					.load();
+			if (nestedScrolling) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					pdfView.setNestedScrollingEnabled(nestedScrolling);
+				}
+			}
 		}
 
 		@Override
