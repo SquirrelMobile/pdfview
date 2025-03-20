@@ -232,7 +232,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
     public void handleLinkEvent(LinkTapEvent event) {
         String uri = event.getLink().getUri();
         KrollDict kd = new KrollDict();
-        kd.put("link", uri);
+        kd.put("url", uri);
         fireEvent("link", kd);
     }
 
