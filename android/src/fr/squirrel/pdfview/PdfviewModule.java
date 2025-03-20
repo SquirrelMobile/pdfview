@@ -4,7 +4,6 @@
  * Copyright (c) 2009-2018 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
- *
  */
 package fr.squirrel.pdfview;
 
@@ -13,24 +12,20 @@ import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.titanium.TiApplication;
 
-@Kroll.module(name="Pdfview", id="fr.squirrel.pdfview")
-public class PdfviewModule extends KrollModule
-{
+@Kroll.module(name = "Pdfview", id = "fr.squirrel.pdfview")
+public class PdfviewModule extends KrollModule {
 
-	// Standard Debugging variables
-	private static final String LCAT = "PdfviewModule";
-	private static final boolean DBG = TiConfig.LOGD;
+    // Standard Debugging variables
+    private static final String LCAT = "PdfviewModule";
+    private static final boolean DBG = TiConfig.LOGD;
 
-	public PdfviewModule()
-	{
-		super();
-		
-	}
+    public PdfviewModule() {
+        super();
+    }
 
-	@Kroll.onAppCreate
-	public static void onAppCreate(TiApplication app)
-	{
-	}
+    @Kroll.onAppCreate
+    public static void onAppCreate(TiApplication app) {
+    }
 
 }
 

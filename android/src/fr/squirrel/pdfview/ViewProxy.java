@@ -17,7 +17,6 @@ import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.view.TiUIView;
 
 
-// This proxy can be created by calling Pdfview.createExample({message: "hello world"})
 @Kroll.proxy(creatableInModule = PdfviewModule.class)
 public class ViewProxy extends TiViewProxy {
     // Standard Debugging variables
