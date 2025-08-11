@@ -38,6 +38,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
 
     PDFView pdfView;
     int space = 20;
+    int pageNumber = 0;
     int layout_drawer_main = 0;
     int mode = MODE_URL;
     String currentUrl;
@@ -86,6 +87,14 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
         }
         if (arg0.equals("file")) {
             setFile(arg0);
+        }
+        if (arg0.equals("pageNumber")) {
+            this.pageNumber = TiConvert.toInt(arg2);
+            try {
+                pdfView.jumpTo(pageNumber, true);
+            } catch (Exception e) {
+                reload();
+            }
         }
     }
 
@@ -144,6 +153,9 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
             this.space = TiConvert.toInt(proxy.getProperty("spacing"));
             reload();
         }
+        if (props.containsKey("pageNumber")) {
+            this.pageNumber = TiConvert.toInt(proxy.getProperty("pageNumber"));
+        }
 
         if (props.containsKey("file")) {
             setFile(proxy.getProperty("file"));
@@ -192,6 +204,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
                         .linkHandler(this)
+                        .defaultPage(pageNumber)
                         .spacing(space)
                         .load();
                 if (nestedScrolling) {
@@ -207,6 +220,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                         .onError(this)
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
+                        .defaultPage(pageNumber)
                         .spacing(space)
                         .linkHandler(this)
                         .load();
@@ -262,6 +276,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                     .linkHandler(PdfViewer.this)
                     .swipeHorizontal(swipeHorizontal)
                     .nightMode(nightMode)
+                    .defaultPage(pageNumber)
                     .spacing(space)
                     .load();
             if (nestedScrolling) {
