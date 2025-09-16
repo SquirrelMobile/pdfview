@@ -15,4 +15,4 @@ name: pdfview
 moduleid: fr.squirrel.pdfview
 guid: 1705937f-0095-415f-a473-8c8b9a95651c
 platform: android
-minsdk: 12.6.0.GA
+minsdk: 12.7.0.GA
