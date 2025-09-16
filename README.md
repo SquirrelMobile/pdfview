@@ -10,6 +10,15 @@ Module for display pdf in a view in titanium, with zoom + scroll.
 
 	fr.squirrel.pdfview
 
+## Requirements:
+* Titanium 12.7.0
+* add the following lines to your app/platform/android/build.gradle file:
+```
+repositories {
+	maven { url 'https://jitpack.io' }
+}
+```
+
 ## Example usage
 Load a pdf with "url" property
 
