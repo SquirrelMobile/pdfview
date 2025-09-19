@@ -89,7 +89,7 @@ win.open();
 - <b>midZoom (float)</b> : sets mid zoom level (default 1.75)
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)
 * <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false)
-- <b>pageNumber (int)</b> : sets the initial page number to display (default 0)
+- <b>pageNumber (int)</b> : sets the initial page number to display (default 0). Number is the page index starting with 0 (page 1).
 
 ## Events
 
