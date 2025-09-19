@@ -1,39 +1,14 @@
-// This is a test harness for your module
-// You should do something interesting in this harness
-// to test out the module and to provide instructions
-// to users on how to use it by example.
-
-
-// open a single window
-var win = Ti.UI.createWindow({
-	backgroundColor:'white'
-});
-var label = Ti.UI.createLabel();
-win.add(label);
+var win = Ti.UI.createWindow();
 win.open();
+import pv from 'fr.squirrel.pdfview';
 
-// TODO: write your module tests here
-var pdfview = require('fr.squirrel.pdfview');
-Ti.API.info("module is => " + pdfview);
-
-label.text = pdfview.example();
-
-Ti.API.info("module exampleProp is => " + pdfview.exampleProp);
-pdfview.exampleProp = "This is a test value";
-
-if (Ti.Platform.name == "android") {
-	var proxy = pdfview.createExample({
-		message: "Creating an example Proxy",
-		backgroundColor: "red",
-		width: 100,
-		height: 100,
-		top: 100,
-		left: 150
-	});
-
-	proxy.printMessage("Hello world!");
-	proxy.message = "Hi world!.  It's me again.";
-	proxy.printMessage("Hello world!");
-	win.add(proxy);
-}
-
+var pdfView = pv.createView({
+	height: Ti.UI.FILL,
+	width: Ti.UI.FILL,
+	url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+});
+win.addEventListener("open", function() {
+	pdfView.minZoom = 0.5;
+	pdfView.maxZoom = 10;
+})
+win.add(pdfView);

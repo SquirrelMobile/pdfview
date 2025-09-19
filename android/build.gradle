@@ -1,4 +1,8 @@
+repositories {
+	maven { url 'https://jitpack.io' }
+}
 
 dependencies {
-	implementation 'com.github.barteksc:android-pdf-viewer:3.2.0-beta.1'
+	// https://github.com/martinkade/android-pdf-viewer
+	implementation 'com.github.martinkade:android-pdf-viewer:4.0.0'
 }
