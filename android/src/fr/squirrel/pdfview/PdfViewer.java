@@ -166,6 +166,13 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
         }
     }
 
+    public void clear() {
+        this.currentUrl = null;
+        this.currentFile = null;
+        this.currentStream = null;
+        pdfView.recycle();
+    }
+
     public void setUrl(String s) {
         mode = MODE_URL;
         this.currentUrl = s;
