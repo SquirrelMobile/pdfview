@@ -22,7 +22,7 @@ public class ViewProxy extends TiViewProxy {
     // Standard Debugging variables
     private static final String LCAT = "ExampleProxy";
     private static final boolean DBG = TiConfig.LOGD;
-    private static PdfViewer pdfViewer;
+    private PdfViewer pdfViewer;
 
     // Constructor
     public ViewProxy() {
@@ -38,6 +38,7 @@ public class ViewProxy extends TiViewProxy {
     }
 
     @Kroll.method
+    @Kroll.setProperty
     private void setFile(Object f) {
         if (pdfViewer != null) pdfViewer.setFile(f);
     }
@@ -55,6 +56,11 @@ public class ViewProxy extends TiViewProxy {
     @Kroll.setProperty
     private void setMidZoom(Object value) {
         if (pdfViewer != null) pdfViewer.setMidZoom(TiConvert.toFloat(value));
+    }
+
+    @Kroll.method
+    private void clear() {
+        if (pdfViewer != null) pdfViewer.clear();
     }
 
     @Kroll.method

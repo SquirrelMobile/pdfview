@@ -94,3 +94,7 @@ win.open();
 ## Events
 
 - <b>error</b>: with `message`, `passwordError` (true if password is wrong)
+
+## Methods
+
+- <b>clear()</b>: clear the pdfview
