@@ -94,6 +94,7 @@ win.open();
 ## Events
 
 - <b>error</b>: with `message`, `passwordError` (true if password is wrong)
+- <b>pageChanged</b>: fired when the displayed page changes, with `currentPage` (0-based page index) and `pageCount` (total number of pages)
 
 ## Methods
 

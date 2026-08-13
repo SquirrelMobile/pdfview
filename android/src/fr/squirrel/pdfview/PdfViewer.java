@@ -8,6 +8,8 @@ import android.widget.RelativeLayout;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.shockwave.pdfium.PdfPasswordException;
 
@@ -29,7 +31,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler {
+public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler, OnPageChangeListener, OnLoadCompleteListener {
 
 
     int MODE_URL = 0;
@@ -76,25 +78,24 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
     // TODO Auto-generated constructor stub
     @Override
     public void propertyChanged(String arg0, Object arg1, Object arg2, KrollProxy arg3) {
-        // TODO Auto-generated method stub
-
         if (arg0.equals("url")) {
-            setUrl(TiConvert.toString(arg0));
+            setUrl(TiConvert.toString(arg2));
         }
         if (arg0.equals("spacing")) {
-            this.space = TiConvert.toInt(arg0);
+            this.space = TiConvert.toInt(arg2);
             reload();
         }
         if (arg0.equals("file")) {
-            setFile(arg0);
+            setFile(arg2);
         }
         if (arg0.equals("pageNumber")) {
             this.pageNumber = TiConvert.toInt(arg2);
-            try {
-                pdfView.jumpTo(pageNumber, true);
-            } catch (Exception e) {
-                reload();
-            }
+            // jumpTo is a silent no-op while the document is still loading;
+            // loadComplete() applies the pending page in that case.
+            // No animation: the animated jump recomputes the page from the scroll
+            // offset on every frame and can be cancelled by pageSnap, landing back
+            // on the old page.
+            pdfView.jumpTo(pageNumber, false);
         }
     }
 
@@ -208,6 +209,8 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                         .pageSnap(pageSnap)
                         .pageFling(pageFling)
                         .onError(this)
+                        .onLoad(this)
+                        .onPageChange(this)
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
                         .linkHandler(this)
@@ -225,6 +228,8 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                         .pageSnap(pageSnap)
                         .pageFling(pageFling)
                         .onError(this)
+                        .onLoad(this)
+                        .onPageChange(this)
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
                         .defaultPage(pageNumber)
@@ -247,6 +252,24 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
         }
         fireEvent("error", kd);
         Log.e("pdfview", t.getMessage());
+    }
+
+    @Override
+    public void loadComplete(int nbPages) {
+        // apply a pageNumber that was set while the document was still loading
+        if (pdfView.getCurrentPage() != pageNumber) {
+            pdfView.jumpTo(pageNumber, false);
+        }
+    }
+
+    @Override
+    public void onPageChanged(int page, int pageCount) {
+        this.pageNumber = page;
+        proxy.setProperty("pageNumber", page);
+        KrollDict kd = new KrollDict();
+        kd.put("currentPage", page);
+        kd.put("pageCount", pageCount);
+        fireEvent("pageChanged", kd);
     }
 
     @Override
@@ -279,6 +302,8 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler 
                     .password(password)
                     .pageSnap(pageSnap)
                     .onError(this)
+                    .onLoad(PdfViewer.this)
+                    .onPageChange(PdfViewer.this)
                     .pageFling(pageFling)
                     .linkHandler(PdfViewer.this)
                     .swipeHorizontal(swipeHorizontal)
