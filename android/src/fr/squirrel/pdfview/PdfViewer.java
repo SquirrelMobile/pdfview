@@ -3,12 +3,15 @@ package fr.squirrel.pdfview;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
+import com.github.barteksc.pdfviewer.LinkHitTester;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.shockwave.pdfium.PdfPasswordException;
@@ -31,7 +34,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler, OnPageChangeListener, OnLoadCompleteListener {
+public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler, OnPageChangeListener, OnLoadCompleteListener, OnLongPressListener {
 
 
     int MODE_URL = 0;
@@ -211,6 +214,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                         .onError(this)
                         .onLoad(this)
                         .onPageChange(this)
+                        .onLongPress(this)
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
                         .linkHandler(this)
@@ -230,6 +234,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                         .onError(this)
                         .onLoad(this)
                         .onPageChange(this)
+                        .onLongPress(this)
                         .swipeHorizontal(swipeHorizontal)
                         .nightMode(nightMode)
                         .defaultPage(pageNumber)
@@ -273,6 +278,20 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
     }
 
     @Override
+    public void onLongPress(MotionEvent event) {
+        // report view-relative coordinates in dp, like Titanium's own touch events
+        float density = pdfView.getResources().getDisplayMetrics().density;
+        KrollDict kd = new KrollDict();
+        kd.put("x", event.getX() / density);
+        kd.put("y", event.getY() / density);
+        String url = LinkHitTester.getLinkAtPosition(pdfView, event.getX(), event.getY());
+        if (url != null && !url.isEmpty()) {
+            kd.put("url", url);
+        }
+        fireEvent("longpress", kd);
+    }
+
+    @Override
     public void handleLinkEvent(LinkTapEvent event) {
         String uri = event.getLink().getUri();
         KrollDict kd = new KrollDict();
@@ -304,6 +323,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                     .onError(this)
                     .onLoad(PdfViewer.this)
                     .onPageChange(PdfViewer.this)
+                    .onLongPress(PdfViewer.this)
                     .pageFling(pageFling)
                     .linkHandler(PdfViewer.this)
                     .swipeHorizontal(swipeHorizontal)

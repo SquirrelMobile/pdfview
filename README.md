@@ -96,12 +96,24 @@ win.open();
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)
 * <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false, Android only)
 - <b>pageNumber (int)</b> : sets the initial page number to display (default 0). Number is the page index starting with 0 (page 1).
+- <b>textSelection (boolean)</b> : allow selecting text in the PDF with a long-press (default: false, iOS only - Android renders pages as bitmaps and has no text selection). When enabled, a long-press on text starts the selection <i>and</i> fires the `longpress` event; keep it disabled if you only want the event.
 
 ## Events
 
 - <b>error</b>: with `message`, `passwordError` (true if password is wrong)
 - <b>pageChanged</b>: fired when the displayed page changes, with `currentPage` (0-based page index) and `pageCount` (total number of pages)
 - <b>link</b>: fired when a link inside the PDF is tapped, with `url` (the link is not opened automatically)
+- <b>longpress</b>: fired when the user long-presses the PDF, with `x` and `y` (view-relative coordinates in dp/points). If the press hits a link inside the PDF, `url` contains its target (otherwise `url` is not set).
+
+```js
+pdfView.addEventListener("longpress", function(e) {
+	if (e.url) {
+		console.log("longpress on link " + e.url);
+	} else {
+		console.log("longpress at " + e.x + "/" + e.y);
+	}
+});
+```
 
 ## Methods
 

@@ -8,9 +8,10 @@
 #import "TiUIView.h"
 #import <PDFKit/PDFKit.h>
 
-@interface FrSquirrelPdfviewView : TiUIView <PDFViewDelegate> {
+@interface FrSquirrelPdfviewView : TiUIView <PDFViewDelegate, UIGestureRecognizerDelegate> {
   @private
   PDFView *pdfView;
+  UILongPressGestureRecognizer *pdfLongPressRecognizer;
   NSURLSessionDataTask *downloadTask;
   NSInteger pageNumber;
   NSInteger lastReportedPage;
@@ -20,6 +21,7 @@
   CGFloat midZoom;
   BOOL pageSnap;
   BOOL pageFling;
+  BOOL textSelection;
 }
 
 - (void)clear;

@@ -25,6 +25,7 @@
     midZoom = 1.75;
     pageSnap = NO;
     pageFling = NO;
+    textSelection = NO;
   }
   return self;
 }
@@ -46,6 +47,11 @@
                                              selector:@selector(pageChangedNotification:)
                                                  name:PDFViewPageChangedNotification
                                                object:pdfView];
+    // the PDFView is recreated per document, so the recognizer is re-attached here
+    pdfLongPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressDetected:)];
+    pdfLongPressRecognizer.cancelsTouchesInView = NO;
+    pdfLongPressRecognizer.delegate = self;
+    [pdfView addGestureRecognizer:pdfLongPressRecognizer];
     [self addSubview:pdfView];
     // the PDFView is recreated for every document (see showDocument:), so the
     // configuration has to be re-applied from the proxy properties each time
@@ -76,6 +82,35 @@
   }
 }
 
+- (void)updateInteractions:(UIView *)view
+{
+  // PDFKit adds UIDragInteractions that start a drag-and-drop lift on
+  // long-press; its preview code crashes with a NaN layer position when the
+  // pressed page has not finished rendering (CALayerInvalidGeometry). Drag
+  // out of the PDF is not a module feature, so turn the interactions off.
+  for (id<UIInteraction> interaction in view.interactions) {
+    if ([interaction isKindOfClass:[UIDragInteraction class]]) {
+      ((UIDragInteraction *)interaction).enabled = NO;
+    }
+  }
+  // PDFKit selects text through its own long-press (and "tap and a half")
+  // recognizers, which swallow the touch before the module's longpress
+  // recognizer sees it. Keep them in the state the textSelection property asks
+  // for; the module's own recognizer must stay untouched.
+  for (UIGestureRecognizer *recognizer in view.gestureRecognizers) {
+    if (recognizer == pdfLongPressRecognizer) {
+      continue;
+    }
+    if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]]
+        || [NSStringFromClass([recognizer class]) containsString:@"TapAndAHalf"]) {
+      recognizer.enabled = textSelection;
+    }
+  }
+  for (UIView *subview in view.subviews) {
+    [self updateInteractions:subview];
+  }
+}
+
 - (void)destroyPdfView
 {
   if (pdfView == nil) {
@@ -86,6 +121,7 @@
   pdfView.document = nil;
   [pdfView removeFromSuperview];
   pdfView = nil;
+  pdfLongPressRecognizer = nil;
 }
 
 - (void)frameSizeChanged:(CGRect)frame bounds:(CGRect)bounds
@@ -203,6 +239,7 @@
   view.alpha = 0.0;
   view.document = document;
   [view layoutDocumentView];
+  [self updateInteractions:view];
   [self applyZoomLimits];
   [self goToPage:pageNumber];
   [self reportPageChange];
@@ -217,6 +254,7 @@
       [self applyZoomLimits];
       [self goToPage:self->pageNumber];
       [self removeLayerAnimations:self->pdfView.layer];
+      [self updateInteractions:self->pdfView];
       self->pdfView.alpha = 1.0;
     });
   });
@@ -347,10 +385,22 @@
   // Android-only property, accepted for parity
 }
 
+- (void)setTextSelection_:(id)value
+{
+  textSelection = [TiUtils boolValue:value def:NO];
+  if (pdfView != nil) {
+    [self updateInteractions:pdfView];
+  }
+}
+
 #pragma mark Events
 
 - (void)pageChangedNotification:(NSNotification *)notification
 {
+  // in page-view-controller mode PDFKit creates new page views (with their
+  // own drag interactions and selection recognizers) while paging, so sweep
+  // again on every page change
+  [self updateInteractions:pdfView];
   [self reportPageChange];
 }
 
@@ -375,6 +425,49 @@
                  @"pageCount" : NUMUINTEGER(document.pageCount)
                }];
   }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithOtherGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+  // PDFKit installs its own recognizers (text selection etc.); ours must not block them
+  return YES;
+}
+
+- (void)longPressDetected:(UILongPressGestureRecognizer *)recognizer
+{
+  if (recognizer.state != UIGestureRecognizerStateBegan) {
+    return;
+  }
+  if ([self.proxy _hasListeners:@"longpress"]) {
+    CGPoint point = [recognizer locationInView:self];
+    NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
+      @"x" : NUMFLOAT(point.x),
+      @"y" : NUMFLOAT(point.y)
+    }];
+    NSString *url = [self linkAtPoint:[recognizer locationInView:pdfView]];
+    if (url != nil) {
+      [event setObject:url forKey:@"url"];
+    }
+    [self.proxy fireEvent:@"longpress" withObject:event];
+  }
+}
+
+- (NSString *)linkAtPoint:(CGPoint)point
+{
+  PDFPage *page = [pdfView pageForPoint:point nearest:NO];
+  if (page == nil) {
+    return nil;
+  }
+  CGPoint pagePoint = [pdfView convertPoint:point toPage:page];
+  PDFAnnotation *annotation = [page annotationAtPoint:pagePoint];
+  if (annotation == nil) {
+    return nil;
+  }
+  NSURL *url = annotation.URL;
+  if (url == nil && [annotation.action isKindOfClass:[PDFActionURL class]]) {
+    url = [(PDFActionURL *)annotation.action URL];
+  }
+  return [url absoluteString];
 }
 
 - (void)PDFViewWillClickOnLink:(PDFView *)sender withURL:(NSURL *)url
