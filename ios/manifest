@@ -1,0 +1,19 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 2.2.0
+apiversion: 2
+architectures: arm64 x86_64
+mac: true
+description: pdfview
+author: Michael Gangolf
+license: Specify your license
+copyright: Copyright (c) 2026 by Your Company
+
+# these should not be edited
+name: pdfview
+moduleid: fr.squirrel.pdfview
+guid: 1705937f-0095-415f-a473-8c8b9a95651c
+platform: iphone
+minsdk: 13.3.0.GA

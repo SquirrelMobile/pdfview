@@ -1,7 +1,9 @@
 
-# pdfView for Android
+# pdfView for Android and iOS
 
 Module for display pdf in a view in titanium, with zoom + scroll.
+
+Uses [AndroidPdfViewer](https://github.com/barteksc/AndroidPdfViewer) on Android and [PDFKit](https://developer.apple.com/documentation/pdfkit) (PDFView) on iOS.
 
 
 <img src="https://github.com/SquirrelMobile/pdfview/blob/master/screen/gifExample.gif?raw=true" width="200" >
@@ -10,14 +12,18 @@ Module for display pdf in a view in titanium, with zoom + scroll.
 
 	fr.squirrel.pdfview
 
-## Requirements:
-* Titanium 12.7.0
+## Requirements (Android):
+* Titanium 13.3.0
 * add the following lines to your app/platform/android/build.gradle file:
 ```
 repositories {
 	maven { url 'https://jitpack.io' }
 }
 ```
+
+## Requirements (iOS):
+* Titanium 13.3.0.GA+
+* iOS 12+
 
 ## Example usage
 Load a pdf with "url" property
@@ -78,23 +84,24 @@ win.open();
 ## Properties
 
 - <b>url (string)</b> : this property is for load a pdf directly by url.
-- <b>file (Ti.Filesystem.File)</b> : this property is for load a pdf directly by a file.
+- <b>file (Ti.Filesystem.File or Ti.Blob)</b> : this property is for load a pdf directly by a file.
 - <b>spacing</b> : this property is for edit the spacing between pages in dp.
 - <b>password (string)</b> : password for a protected PDF file
-- <b>nightMode (boolean)</b> : night mode
+- <b>nightMode (boolean)</b> : night mode (iOS: only darkens the background, page content is not inverted)
 - <b>pageFling (boolean)</b> : make a fling change only a single page like ViewPager
 - <b>pageSnap (boolean)</b> : snap pages to screen boundaries at the end of a scroll
 - <b>swipeHorizontal (boolean)</b> : horizontal swipe
 - <b>minZoom (float)</b> : sets min zoom level (default 1)
-- <b>midZoom (float)</b> : sets mid zoom level (default 1.75)
+- <b>midZoom (float)</b> : sets mid zoom level (default 1.75, Android only)
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)
-* <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false)
+* <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false, Android only)
 - <b>pageNumber (int)</b> : sets the initial page number to display (default 0). Number is the page index starting with 0 (page 1).
 
 ## Events
 
 - <b>error</b>: with `message`, `passwordError` (true if password is wrong)
 - <b>pageChanged</b>: fired when the displayed page changes, with `currentPage` (0-based page index) and `pageCount` (total number of pages)
+- <b>link</b>: fired when a link inside the PDF is tapped, with `url` (the link is not opened automatically)
 
 ## Methods
 

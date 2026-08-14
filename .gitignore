@@ -7,3 +7,6 @@ android/build.properties
 .DS_Store
 /android/.gradle
 /android/.settings/org.eclipse.buildship.core.prefs
+ios/build
+ios/*.xcuserstate
+
