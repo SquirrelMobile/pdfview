@@ -9,4 +9,4 @@ android/build.properties
 /android/.settings/org.eclipse.buildship.core.prefs
 ios/build
 ios/*.xcuserstate
-
+ios/dist
