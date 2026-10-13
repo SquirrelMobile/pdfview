@@ -14,6 +14,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
+import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.shockwave.pdfium.PdfPasswordException;
 
 import org.appcelerator.kroll.KrollDict;
@@ -58,6 +59,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
     float maxZoom = 3.0f;
     float minZoom = 1.0f;
     float midZoom = 1.75f;
+    FitPolicy fitPolicy = FitPolicy.WIDTH;
 
     public PdfViewer(TiViewProxy proxy) {
         super(proxy);
@@ -91,6 +93,11 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
         if (arg0.equals("file")) {
             setFile(arg2);
         }
+        if (arg0.equals("fitPolicy")) {
+            // the fit policy is part of the load configuration, so reload like spacing
+            this.fitPolicy = toFitPolicy(TiConvert.toString(arg2));
+            reload();
+        }
         if (arg0.equals("pageNumber")) {
             this.pageNumber = TiConvert.toInt(arg2);
             // jumpTo is a silent no-op while the document is still loading;
@@ -115,6 +122,23 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
     public void setMidZoom(Float value) {
         midZoom = value;
         pdfView.setMidZoom(midZoom);
+    }
+
+    private FitPolicy toFitPolicy(String value) {
+        if (value == null) {
+            return FitPolicy.WIDTH;
+        }
+        switch (value.toLowerCase()) {
+            case "height":
+                return FitPolicy.HEIGHT;
+            case "both":
+                return FitPolicy.BOTH;
+            case "width":
+                return FitPolicy.WIDTH;
+            default:
+                Log.w("pdfview", "Unknown fitPolicy \"" + value + "\", using \"width\"");
+                return FitPolicy.WIDTH;
+        }
     }
 
 
@@ -148,6 +172,9 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
         }
         if (props.containsKey("pageSnap")) {
             pageSnap = TiConvert.toBoolean(proxy.getProperty("pageSnap"), false);
+        }
+        if (props.containsKey("fitPolicy")) {
+            fitPolicy = toFitPolicy(TiConvert.toString(proxy.getProperty("fitPolicy")));
         }
 
         if (props.containsKey("url")) {
@@ -220,6 +247,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                         .linkHandler(this)
                         .defaultPage(pageNumber)
                         .spacing(space)
+                        .pageFitPolicy(fitPolicy)
                         .load();
                 if (nestedScrolling) {
                     pdfView.setNestedScrollingEnabled(nestedScrolling);
@@ -239,6 +267,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                         .nightMode(nightMode)
                         .defaultPage(pageNumber)
                         .spacing(space)
+                        .pageFitPolicy(fitPolicy)
                         .linkHandler(this)
                         .load();
                 if (nestedScrolling) {
@@ -330,6 +359,7 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
                     .nightMode(nightMode)
                     .defaultPage(pageNumber)
                     .spacing(space)
+                    .pageFitPolicy(fitPolicy)
                     .load();
             if (nestedScrolling) {
                 pdfView.setNestedScrollingEnabled(nestedScrolling);
