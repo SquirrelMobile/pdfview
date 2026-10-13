@@ -91,6 +91,7 @@ win.open();
 - <b>pageFling (boolean)</b> : make a fling change only a single page like ViewPager
 - <b>pageSnap (boolean)</b> : snap pages to screen boundaries at the end of a scroll
 - <b>swipeHorizontal (boolean)</b> : horizontal swipe
+- <b>fitPolicy (string)</b> : how a page is scaled to the view: `"width"` fits the page width (default), `"height"` fits the page height, `"both"` fits the whole page into the view. The fit uses the largest page of the document, so all pages share one scale. `minZoom` and `maxZoom` are relative to this fit.
 - <b>minZoom (float)</b> : sets min zoom level (default 1)
 - <b>midZoom (float)</b> : sets mid zoom level (default 1.75, Android only)
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)

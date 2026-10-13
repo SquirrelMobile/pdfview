@@ -8,6 +8,12 @@
 #import "TiUIView.h"
 #import <PDFKit/PDFKit.h>
 
+typedef NS_ENUM(NSInteger, FrSquirrelPdfviewFitPolicy) {
+  FrSquirrelPdfviewFitPolicyWidth = 0,
+  FrSquirrelPdfviewFitPolicyHeight,
+  FrSquirrelPdfviewFitPolicyBoth
+};
+
 @interface FrSquirrelPdfviewView : TiUIView <PDFViewDelegate, UIGestureRecognizerDelegate> {
   @private
   PDFView *pdfView;
@@ -22,6 +28,12 @@
   BOOL pageSnap;
   BOOL pageFling;
   BOOL textSelection;
+  FrSquirrelPdfviewFitPolicy fitPolicy;
+  // scale that the current fitPolicy resolved to for the current view size,
+  // 0 while PDFKit's own autoScales (fitPolicy "width") is in charge
+  CGFloat currentFitScale;
+  // largest page size of the loaded document, used by the height/both fits
+  CGSize largestPageSize;
 }
 
 - (void)clear;

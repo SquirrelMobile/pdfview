@@ -26,6 +26,9 @@
     pageSnap = NO;
     pageFling = NO;
     textSelection = NO;
+    fitPolicy = FrSquirrelPdfviewFitPolicyWidth;
+    currentFitScale = 0;
+    largestPageSize = CGSizeZero;
   }
   return self;
 }
@@ -122,6 +125,8 @@
   [pdfView removeFromSuperview];
   pdfView = nil;
   pdfLongPressRecognizer = nil;
+  currentFitScale = 0;
+  largestPageSize = CGSizeZero;
 }
 
 - (void)frameSizeChanged:(CGRect)frame bounds:(CGRect)bounds
@@ -129,6 +134,7 @@
   [super frameSizeChanged:frame bounds:bounds];
   if (pdfView != nil) {
     [TiUtils setView:pdfView positionRect:bounds];
+    [self applyFitScale];
     [self applyZoomLimits];
   }
 }
@@ -238,8 +244,10 @@
   // view invisible until that has settled, then reveal it in its final state.
   view.alpha = 0.0;
   view.document = document;
+  largestPageSize = [self largestPageSizeOfDocument:document];
   [view layoutDocumentView];
   [self updateInteractions:view];
+  [self applyFitScale];
   [self applyZoomLimits];
   [self goToPage:pageNumber];
   [self reportPageChange];
@@ -251,6 +259,7 @@
       }
       // layout is final now: re-apply fit and page position without animation,
       // kill any animation PDFKit has still in flight and only then reveal
+      [self applyFitScale];
       [self applyZoomLimits];
       [self goToPage:self->pageNumber];
       [self removeLayerAnimations:self->pdfView.layer];
@@ -272,13 +281,84 @@
 
 #pragma mark Zoom / paging helpers
 
+- (CGSize)largestPageSizeOfDocument:(PDFDocument *)document
+{
+  // like the Android library (fitEachPage = false) the fit is computed from the
+  // widest and the tallest page, so every page shares one scale
+  CGSize size = CGSizeZero;
+  PDFDisplayBox box = pdfView != nil ? pdfView.displayBox : kPDFDisplayBoxCropBox;
+  for (NSUInteger i = 0; i < document.pageCount; i++) {
+    PDFPage *page = [document pageAtIndex:i];
+    CGSize pageSize = [page boundsForBox:box].size;
+    if ((page.rotation / 90) % 2 != 0) {
+      pageSize = CGSizeMake(pageSize.height, pageSize.width);
+    }
+    size.width = MAX(size.width, pageSize.width);
+    size.height = MAX(size.height, pageSize.height);
+  }
+  return size;
+}
+
+- (CGFloat)fitScale
+{
+  // the scale at which the document is "fit to view" under the current fitPolicy
+  if (pdfView == nil || pdfView.document == nil) {
+    return 0;
+  }
+  if (fitPolicy == FrSquirrelPdfviewFitPolicyWidth) {
+    return [pdfView scaleFactorForSizeToFit];
+  }
+  CGSize viewSize = pdfView.bounds.size;
+  if (largestPageSize.width <= 0 || largestPageSize.height <= 0 || viewSize.width <= 0 || viewSize.height <= 0) {
+    // not laid out yet; fall back to PDFKit's own fit so zoom limits stay sane
+    return [pdfView scaleFactorForSizeToFit];
+  }
+  CGFloat heightScale = viewSize.height / largestPageSize.height;
+  if (fitPolicy == FrSquirrelPdfviewFitPolicyHeight) {
+    return heightScale;
+  }
+  return MIN(viewSize.width / largestPageSize.width, heightScale);
+}
+
+- (void)applyFitScale
+{
+  // "width" is PDFKit's own autoScales; "height" and "both" are applied by
+  // hand, keeping the user's zoom relative to the fit (like Android does on a
+  // size change)
+  if (pdfView == nil || pdfView.document == nil) {
+    return;
+  }
+  if (fitPolicy == FrSquirrelPdfviewFitPolicyWidth) {
+    // autoScales is on from creation (see pdfView) or from setFitPolicy_:
+    currentFitScale = 0;
+    return;
+  }
+  CGSize viewSize = pdfView.bounds.size;
+  if (largestPageSize.width <= 0 || largestPageSize.height <= 0 || viewSize.width <= 0 || viewSize.height <= 0) {
+    // the view has no size yet; frameSizeChanged: calls again once it has one
+    return;
+  }
+  CGFloat fit = [self fitScale];
+  if (fit <= 0) {
+    return;
+  }
+  CGFloat relativeZoom = currentFitScale > 0 ? pdfView.scaleFactor / currentFitScale : 1.0;
+  currentFitScale = fit;
+  pdfView.autoScales = NO;
+  // PDFKit clamps scaleFactor to the current limits, so move them to the new
+  // fit first (applyZoomLimits sets the same values again afterwards)
+  pdfView.minScaleFactor = fit * minZoom;
+  pdfView.maxScaleFactor = fit * maxZoom;
+  pdfView.scaleFactor = fit * relativeZoom;
+}
+
 - (void)applyZoomLimits
 {
   if (pdfView == nil || pdfView.document == nil) {
     return;
   }
   // minZoom/maxZoom are relative to the "fit to view" scale, like on Android
-  CGFloat fitScale = [pdfView scaleFactorForSizeToFit];
+  CGFloat fitScale = [self fitScale];
   if (fitScale <= 0) {
     return;
   }
@@ -383,6 +463,30 @@
 - (void)setNestedScrolling_:(id)value
 {
   // Android-only property, accepted for parity
+}
+
+- (void)setFitPolicy_:(id)value
+{
+  NSString *policy = [[TiUtils stringValue:value] lowercaseString];
+  if ([policy isEqualToString:@"height"]) {
+    fitPolicy = FrSquirrelPdfviewFitPolicyHeight;
+  } else if ([policy isEqualToString:@"both"]) {
+    fitPolicy = FrSquirrelPdfviewFitPolicyBoth;
+  } else {
+    if (policy != nil && ![policy isEqualToString:@"width"]) {
+      NSLog(@"[WARN] pdfview: unknown fitPolicy \"%@\", using \"width\"", policy);
+    }
+    fitPolicy = FrSquirrelPdfviewFitPolicyWidth;
+  }
+  if (pdfView != nil && pdfView.document != nil) {
+    // a new policy starts from a fresh fit, the previous zoom is not carried over
+    currentFitScale = 0;
+    if (fitPolicy == FrSquirrelPdfviewFitPolicyWidth) {
+      pdfView.autoScales = YES;
+    }
+    [self applyFitScale];
+    [self applyZoomLimits];
+  }
 }
 
 - (void)setTextSelection_:(id)value
