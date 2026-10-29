@@ -97,11 +97,13 @@ win.open();
 - <b>maxZoom (float)</b> : sets max zoom level (default 3)
 * <b>nestedScrolling (boolean)</b> : enabled nested srcolling (default: false, Android only)
 - <b>pageNumber (int)</b> : sets the initial page number to display (default 0). Number is the page index starting with 0 (page 1).
+- <b>pageCount (int, read-only)</b> : total number of pages of the loaded document. The value is 0 before the document loads and after `clear()`. Use the `load` event to know when the document is loaded.
 - <b>textSelection (boolean)</b> : allow selecting text in the PDF with a long-press (default: false, iOS only - Android renders pages as bitmaps and has no text selection). When enabled, a long-press on text starts the selection <i>and</i> fires the `longpress` event; keep it disabled if you only want the event.
 
 ## Events
 
 - <b>error</b>: with `message`, `passwordError` (true if password is wrong)
+- <b>load</b>: fired once when a document is loaded, with `pageCount` (total number of pages). It fires before the first `pageChanged` event. A load failure fires `error` instead.
 - <b>pageChanged</b>: fired when the displayed page changes, with `currentPage` (0-based page index) and `pageCount` (total number of pages)
 - <b>link</b>: fired when a link inside the PDF is tapped, with `url` (the link is not opened automatically)
 - <b>longpress</b>: fired when the user long-presses the PDF, with `x` and `y` (view-relative coordinates in dp/points). If the press hits a link inside the PDF, `url` contains its target (otherwise `url` is not set).

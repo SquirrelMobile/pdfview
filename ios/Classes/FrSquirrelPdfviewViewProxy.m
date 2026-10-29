@@ -35,4 +35,19 @@
       NO);
 }
 
+- (NSNumber *)pageCount
+{
+  // read-only: total number of pages of the loaded document, 0 before load.
+  // PDFView must be touched on the main thread, so wait for the result.
+  __block NSUInteger count = 0;
+  TiThreadPerformOnMainThread(
+      ^{
+        if ([self viewAttached]) {
+          count = [(FrSquirrelPdfviewView *)[self view] pageCount];
+        }
+      },
+      YES);
+  return NUMUINTEGER(count);
+}
+
 @end
