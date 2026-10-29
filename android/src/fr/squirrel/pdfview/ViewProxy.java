@@ -58,6 +58,12 @@ public class ViewProxy extends TiViewProxy {
         if (pdfViewer != null) pdfViewer.setMidZoom(TiConvert.toFloat(value));
     }
 
+    @Kroll.getProperty
+    public int getPageCount() {
+        // read-only: total number of pages of the loaded document, 0 before load
+        return pdfViewer != null ? pdfViewer.getPageCount() : 0;
+    }
+
     @Kroll.method
     private void clear() {
         if (pdfViewer != null) pdfViewer.clear();

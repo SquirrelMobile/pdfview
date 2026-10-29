@@ -129,6 +129,12 @@
   largestPageSize = CGSizeZero;
 }
 
+- (NSUInteger)pageCount
+{
+  // nil pdfView or nil document both yield 0
+  return pdfView.document.pageCount;
+}
+
 - (void)frameSizeChanged:(CGRect)frame bounds:(CGRect)bounds
 {
   [super frameSizeChanged:frame bounds:bounds];
@@ -250,6 +256,10 @@
   [self applyFitScale];
   [self applyZoomLimits];
   [self goToPage:pageNumber];
+  // "load" first, then the initial "pageChanged", same order as on Android
+  if ([self.proxy _hasListeners:@"load"]) {
+    [self.proxy fireEvent:@"load" withObject:@{ @"pageCount" : NUMUINTEGER(document.pageCount) }];
+  }
   [self reportPageChange];
   dispatch_async(dispatch_get_main_queue(), ^{
     dispatch_async(dispatch_get_main_queue(), ^{

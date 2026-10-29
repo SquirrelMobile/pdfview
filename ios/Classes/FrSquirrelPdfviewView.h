@@ -37,5 +37,6 @@ typedef NS_ENUM(NSInteger, FrSquirrelPdfviewFitPolicy) {
 }
 
 - (void)clear;
+- (NSUInteger)pageCount;
 
 @end

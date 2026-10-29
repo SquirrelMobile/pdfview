@@ -197,6 +197,11 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
         }
     }
 
+    public int getPageCount() {
+        // 0 while no document is loaded (the library returns 0 without a pdfFile)
+        return pdfView != null ? pdfView.getPageCount() : 0;
+    }
+
     public void clear() {
         this.currentUrl = null;
         this.currentFile = null;
@@ -290,6 +295,11 @@ public class PdfViewer extends TiUIView implements OnErrorListener, LinkHandler,
 
     @Override
     public void loadComplete(int nbPages) {
+        // the library fires this before the first onPageChanged, so "load"
+        // always arrives before "pageChanged" (iOS keeps the same order)
+        KrollDict kd = new KrollDict();
+        kd.put("pageCount", nbPages);
+        fireEvent("load", kd);
         // apply a pageNumber that was set while the document was still loading
         if (pdfView.getCurrentPage() != pageNumber) {
             pdfView.jumpTo(pageNumber, false);

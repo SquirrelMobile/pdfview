@@ -10,5 +10,6 @@
 @interface FrSquirrelPdfviewViewProxy : TiViewProxy
 
 - (void)clear:(id)unused;
+- (NSNumber *)pageCount;
 
 @end
